@@ -93,6 +93,8 @@ class MacrobotPredictor:
                     show=self.show,
                     save=self.save_yolo_runs,
                     verbose=False,
+                    conf=0.15,
+                    iou=0.6,
                 )
 
                 if not results:

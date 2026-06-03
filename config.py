@@ -7,22 +7,24 @@ from pathlib import Path
 
 # -------------------- user settings --------------------
 
-MODEL_PATH = r"yolov8s-seg_img1024_ep150_AdamW_lr0.0005_best.pt"
-
+#MODEL_PATH = r"yolov8s-seg_img1024_ep150_AdamW_lr0.0005_best.pt"
+#MODEL_PATH = r"D:\stefanie\fus_root_high_02\yolov8s-seg_img1024_ep150_AdamW_lr0.0005\weights\best.pt"
+MODEL_PATH = r"D:/stefanie/02_split_model/yolov8s-seg_img1024_ep150_AdamW_lr0.0005/weights/best.pt"
 # Input root:
 #   ROOT_FOLDER / MB0001 / 10dai / 20250727_154933__F35-4 / ...preview.tif
-ROOT_FOLDER = r"\\psg-09\Mikroskop\Exchange\!to_analyze\macrobot\fusarium\MB0361"
-
+#ROOT_FOLDER = r"\\psg-09\Mikroskop\Exchange\!to_analyze\macrobot\fusarium\MB0361"
+#ROOT_FOLDER = r"\\hsm\AGR-BIM\macrobot\MB0560"
+ROOT_FOLDER = r"D:\stefanie\screening"
 # Output root – same structure (experiment / timepoint / plate),
 # but filenames are clearly marked as predictions.
-OUTPUT_ROOT = r"\\psg-09\Mikroskop\Images\FusVision\MB0361_yolov8s_test"
-
-
+#OUTPUT_ROOT = r"\\psg-09\Mikroskop\Images\FusVision\MB0361_yolov8s_test"
+#OUTPUT_ROOT = r"D:\stefanie\MB0560_002"
+OUTPUT_ROOT = r"D:\stefanie\screening\out"
 # Folder layout of ROOT_FOLDER.
 # False means: ROOT_FOLDER / timepoint / plate_id / image
 # True means:  ROOT_FOLDER / experiment / timepoint / plate_id / image
 # Your current MB0504 path uses False, because MB0504 is already the experiment root.
-INPUT_HAS_EXPERIMENT_LEVEL = False
+INPUT_HAS_EXPERIMENT_LEVEL = True
 EXPERIMENT_NAME = Path(ROOT_FOLDER).name
 
 # ONLY process these (experiment, timepoint) combinations.

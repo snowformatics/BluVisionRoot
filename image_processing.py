@@ -11,36 +11,6 @@ import cv2
 import numpy as np
 
 
-# def wb_helper(channel: np.ndarray, clip_percent: float = 0.05) -> np.ndarray:
-#     """
-#     Simple white-balance based on percentile clipping.
-#
-#     Args:
-#         channel: single-channel image (2D array).
-#         clip_percent: fraction of pixels to clip from both ends
-#                       (e.g. 0.05 -> clip lowest 5% and highest 5%).
-#
-#     Returns:
-#         White-balanced channel as uint8.
-#     """
-#     ch = channel.astype(np.float32)
-#
-#     lower_percentile = clip_percent * 100.0
-#     upper_percentile = (1.0 - clip_percent) * 100.0
-#
-#     low_val = np.percentile(ch, lower_percentile)
-#     high_val = np.percentile(ch, upper_percentile)
-#
-#     if high_val <= low_val:
-#         # avoid division by zero; return original channel unchanged
-#         return channel
-#
-#     ch = np.clip(ch, low_val, high_val)
-#     ch = (ch - low_val) * (255.0 / (high_val - low_val))
-#
-#     return np.clip(ch, 0, 255).astype(np.uint8)
-
-
 def maxrgb_filter(bgr_img: np.ndarray):
     """
     Apply MaxRGB filter:

@@ -8,7 +8,7 @@
 BluVision Root is a Python pipeline for automated **Fusarium root infection analysis** from macrobot images. It preprocesses images, runs a YOLOv8 segmentation model, extracts object-level severity features, summarizes infection by four horizontal lanes, and creates convenient HTML reports for visual inspection.
 
 <img src="BluVisionRoot.png" width="1000">
----
+
 
 ## ✨ What this tool does
 
@@ -221,7 +221,7 @@ Because the MaxRGB image keeps only the dominant channel per pixel, this measure
 
 ## 📜 License
 
-
+GNU GENERAL PUBLIC LICENSE Version 3
 
 
 ## 🆕 Latest metric update
