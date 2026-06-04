@@ -75,8 +75,9 @@ def build_output_paths(img_path: Path, root_folder: str, output_root: str):
     out_boxes = out_dir / f"{stem}_boxes.png"
     out_poly = out_dir / f"{stem}_poly.png"
     out_maxrgb = out_dir / f"{stem}_maxrgb.png"
+    out_hsv_v = out_dir / f"{stem}_hsv_v.png"
     out_preprocessed_bgr = out_dir / f"{stem}_wb.png"
-    return out_boxes, out_poly, out_maxrgb, out_preprocessed_bgr
+    return out_boxes, out_poly, out_maxrgb, out_hsv_v, out_preprocessed_bgr
 
 
 def experiment_csv_dir(output_root: str, experiment: str) -> Path:
@@ -120,4 +121,4 @@ def write_experiment_csvs(experiment_rows, output_root: str, lane_summary_rows=N
 
     print("\nDone!")
     print("Check:")
-    print(f"  - '{output_root}' for wb, boxes, polygons, MaxRGB images and CSVs")
+    print(f"  - '{output_root}' for wb, boxes, polygons, MaxRGB, HSV-V images and CSVs")

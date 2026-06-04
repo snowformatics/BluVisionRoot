@@ -9,10 +9,12 @@ Usage (from this folder):
 from config import (
     CLASS_COLORS,
     CLIP_PERCENT,
+    CONF_THRESHOLD,
     DEVICE,
     FILE_SUFFIX,
     FUSARIUM_CLASS_ID,
     IMG_SIZE,
+    IOU_THRESHOLD,
     N_LANES,
     MODEL_PATH,
     OUTPUT_ROOT,
@@ -34,6 +36,8 @@ def main():
         clip_percent=CLIP_PERCENT,
         class_colors=CLASS_COLORS,
         fusarium_class_id=FUSARIUM_CLASS_ID,
+        conf_threshold=CONF_THRESHOLD,
+        iou_threshold=IOU_THRESHOLD,
         n_lanes=N_LANES,
     )
     predictor.predict_folder(ROOT_FOLDER, OUTPUT_ROOT, FILE_SUFFIX)

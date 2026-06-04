@@ -3,6 +3,7 @@
 Image preprocessing utilities:
   - White balance (percentile clipping)
   - MaxRGB filter
+  - HSV value channel extraction
   - Overall preprocessing for YOLO & severity analysis
 """
 
@@ -40,6 +41,22 @@ def maxrgb_filter(bgr_img: np.ndarray):
     feature_image = cv2.merge([b2, g2, r2])
 
     return feature_image, r2
+
+
+def hsv_value_channel(bgr_img: np.ndarray) -> np.ndarray:
+    """
+    Extract the V (value/brightness) channel from HSV.
+
+    Args:
+        bgr_img: preprocessed BGR image (uint8).
+
+    Returns:
+        hsv_v: single-channel uint8 value/brightness image, where 0 = dark
+               and 255 = bright.
+    """
+    hsv = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
+    _h, _s, v = cv2.split(hsv)
+    return v
 
 
 def convert_to_8bit(img):
@@ -126,8 +143,9 @@ def preprocess_image(img_path):
         bgr_wb = mild_contrast_normalization(bgr_wb)
 
     maxrgb_bgr, maxrgb_red = maxrgb_filter(bgr_wb)
+    hsv_v = hsv_value_channel(bgr_wb)
 
-    return bgr_wb, maxrgb_bgr, maxrgb_red
+    return bgr_wb, maxrgb_bgr, maxrgb_red, hsv_v
 
     return img
     # """
@@ -169,5 +187,6 @@ def preprocess_image(img_path):
 
     # MaxRGB filter for severity & saving
     maxrgb_bgr, maxrgb_red = maxrgb_filter(bgr_wb)
+    hsv_v = hsv_value_channel(bgr_wb)
 
-    return bgr_wb, maxrgb_bgr, maxrgb_red
+    return bgr_wb, maxrgb_bgr, maxrgb_red, hsv_v

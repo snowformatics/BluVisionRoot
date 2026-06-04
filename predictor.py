@@ -10,7 +10,7 @@ Core prediction logic:
 import cv2
 from ultralytics import YOLO
 
-from config import CLASS_COLORS, N_LANES
+from config import CLASS_COLORS, CONF_THRESHOLD, IOU_THRESHOLD, N_LANES
 from image_processing import preprocess_image
 from io_utils import (
     build_output_paths,
@@ -33,6 +33,8 @@ class MacrobotPredictor:
                  clip_percent: float = 0.05,
                  class_colors=None,
                  fusarium_class_id: int = 0,
+                 conf_threshold: float = CONF_THRESHOLD,
+                 iou_threshold: float = IOU_THRESHOLD,
                  n_lanes: int = N_LANES):
         self.model = YOLO(model_path)
         self.imgsz = imgsz
@@ -42,6 +44,8 @@ class MacrobotPredictor:
         self.clip_percent = clip_percent
         self.class_colors = class_colors if class_colors is not None else CLASS_COLORS
         self.fusarium_class_id = fusarium_class_id
+        self.conf_threshold = conf_threshold
+        self.iou_threshold = iou_threshold
         self.n_lanes = n_lanes
 
     def predict_folder(self,
@@ -70,9 +74,9 @@ class MacrobotPredictor:
                 experiment, timepoint, plate_id = parse_metadata(img_path, root_folder)
                 image_name = img_path.name
 
-                preprocessed_bgr, maxrgb_bgr, maxrgb_red = preprocess_image(img_path)
+                preprocessed_bgr, maxrgb_bgr, maxrgb_red, hsv_v = preprocess_image(img_path)
 
-                out_boxes_path, out_poly_path, out_maxrgb_path, preprocessed_bgr_path = build_output_paths(
+                out_boxes_path, out_poly_path, out_maxrgb_path, out_hsv_v_path, preprocessed_bgr_path = build_output_paths(
                     img_path, root_folder, output_root
                 )
 
@@ -80,6 +84,11 @@ class MacrobotPredictor:
                     print(f"  !! Could not write MaxRGB image to: {out_maxrgb_path}")
                 else:
                     print(f"  -> saved MaxRGB image to: {out_maxrgb_path}")
+
+                if not cv2.imwrite(str(out_hsv_v_path), hsv_v):
+                    print(f"  !! Could not write HSV value image to: {out_hsv_v_path}")
+                else:
+                    print(f"  -> saved HSV value image to: {out_hsv_v_path}")
 
                 if not cv2.imwrite(str(preprocessed_bgr_path), preprocessed_bgr):
                     print(f"  !! Could not write white-balanced image to: {preprocessed_bgr_path}")
@@ -93,8 +102,8 @@ class MacrobotPredictor:
                     show=self.show,
                     save=self.save_yolo_runs,
                     verbose=False,
-                    conf=0.15,
-                    iou=0.6,
+                    conf=self.conf_threshold,
+                    iou=self.iou_threshold,
                 )
 
                 if not results:
@@ -122,6 +131,7 @@ class MacrobotPredictor:
                 rows = compute_bbox_metrics(
                     result=r,
                     maxrgb_bgr=maxrgb_bgr,
+                    hsv_v=hsv_v,
                     experiment=experiment,
                     timepoint=timepoint,
                     plate_id=plate_id,

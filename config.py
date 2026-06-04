@@ -29,7 +29,7 @@ EXPERIMENT_NAME = Path(ROOT_FOLDER).name
 
 # ONLY process these (experiment, timepoint) combinations.
 # Example: ONLY_COMBINATIONS = [("MB0001", "10dai"), ("MB0002", "11dai")]
-ONLY_COMBINATIONS = []   # empty = process everything
+ONLY_COMBINATIONS = [("MB0347", "1dai")]    # empty = process everything
 
 # YOLO inference image size
 IMG_SIZE = 1024
@@ -39,6 +39,11 @@ DEVICE = "cpu"
 
 # Display YOLO window?
 SHOW = False
+
+# YOLO prediction thresholds used during prediction.
+# CONF_THRESHOLD is also stored for every polygon/object as the YOLO confidence score.
+CONF_THRESHOLD = 0.15
+IOU_THRESHOLD = 0.6
 
 # True = also let YOLO save into runs/...
 SAVE_YOLO_RUNS = False
@@ -81,25 +86,43 @@ CSV_COLUMNS = [
     "class_id",
     "class_name",
     "class_display_name",
+    "confidence",
     "x1",
     "y1",
     "x2",
     "y2",
+    "bbox_width",
+    "bbox_height",
     "box_center_x",
     "box_center_y",
     "lane_id",
     "lane_x_start",
     "lane_x_end",
     "relative_x_position",
+    "polygon_centroid_x",
+    "polygon_centroid_y",
+    "polygon_x_min",
+    "polygon_y_min",
+    "polygon_x_max",
+    "polygon_y_max",
     "polygon_area_px",
+    "overlap_area_px",
+    "overlap_percent",
+    "bbox_overlap_area_px",
+    "bbox_overlap_percent",
+    "mask_overlap_area_px",
+    "mask_overlap_percent",
+    "overlap_object_indices",
     "pixels_fusarium_infection",
     "pixels_root_tissue",
     "pixels_class0",
     "pixels_class1",
     "fusarium_severity_maxrgb_intensity",
     "fusarium_severity_maxrgb_red",
+    "fusarium_severity_hsv_v",
     "control_severity_maxrgb_intensity",
     "control_severity_maxrgb_red",
+    "control_severity_hsv_v",
 ]
 
 # Output CSV column names for per-lane / infection-percent summary.
@@ -119,12 +142,14 @@ LANE_SUMMARY_COLUMNS = [
     "fusarium_infection_area_percent",
     "fusarium_infection_mean_maxrgb_intensity",
     "fusarium_infection_mean_maxrgb_red",
+    "fusarium_infection_mean_hsv_v",
     "root_tissue_polygon_count",
     "root_tissue_polygon_percent",
     "root_tissue_area_px",
     "root_tissue_area_percent",
     "root_tissue_mean_maxrgb_intensity",
     "root_tissue_mean_maxrgb_red",
+    "root_tissue_mean_hsv_v",
     # Backward-compatible raw class columns.
     "class0_polygon_count",
     "class0_polygon_percent",
@@ -132,12 +157,14 @@ LANE_SUMMARY_COLUMNS = [
     "class0_area_percent",
     "class0_mean_maxrgb_intensity",
     "class0_mean_maxrgb_red",
+    "class0_mean_hsv_v",
     "class1_polygon_count",
     "class1_polygon_percent",
     "class1_area_px",
     "class1_area_percent",
     "class1_mean_maxrgb_intensity",
     "class1_mean_maxrgb_red",
+    "class1_mean_hsv_v",
 ]
 
 # -------------------------------------------------------

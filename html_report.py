@@ -103,21 +103,34 @@ def _summary_row(plate_id: str, n_boxes: int, mean_fus: float, med_fus: float, m
 def _bbox_row(row: dict) -> str:
     cls_id = row.get("class_id", -1)
     tr_class = f"row-class-{cls_id}"
+
+    bbox_cx = float(row.get("box_center_x", 0) or 0)
+    bbox_cy = float(row.get("box_center_y", 0) or 0)
+    mask_cx = float(row.get("polygon_centroid_x", 0) or 0)
+    mask_cy = float(row.get("polygon_centroid_y", 0) or 0)
+
     return (
         f"<tr class='{tr_class}'>"
         f"<td>{html.escape(str(row.get('bbox_index', '')))}</td>"
         f"<td>{html.escape(str(row.get('class_display_name') or _class_label(row.get('class_id', ''))))}</td>"
+        f"<td>{float(row.get('confidence', 0) or 0):.3f}</td>"
+        f"<td>{row.get('bbox_width', '')}</td>"
+        f"<td>{row.get('bbox_height', '')}</td>"
         f"<td>{row.get('lane_id', '')}</td>"
         f"<td>{row.get('polygon_area_px', '')}</td>"
-        f"<td>{row.get('pixels_fusarium_infection', row.get('pixels_class0', ''))}</td>"
-        f"<td>{row.get('pixels_root_tissue', row.get('pixels_class1', ''))}</td>"
+        f"<td>{float(row.get('bbox_overlap_percent', row.get('overlap_percent', 0)) or 0):.2f}</td>"
+        f"<td>{float(row.get('mask_overlap_percent', 0) or 0):.2f}</td>"
+        f"<td>{html.escape(str(row.get('overlap_object_indices', '')))}</td>"
+        f"<td>{bbox_cx:.1f}, {bbox_cy:.1f}</td>"
+        f"<td>{mask_cx:.1f}, {mask_cy:.1f}</td>"
         f"<td>{float(row.get('fusarium_severity_maxrgb_intensity', 0) or 0):.2f}</td>"
         f"<td>{float(row.get('fusarium_severity_maxrgb_red', 0) or 0):.2f}</td>"
+        f"<td>{float(row.get('fusarium_severity_hsv_v', 0) or 0):.2f}</td>"
         f"<td>{float(row.get('control_severity_maxrgb_intensity', 0) or 0):.2f}</td>"
         f"<td>{float(row.get('control_severity_maxrgb_red', 0) or 0):.2f}</td>"
+        f"<td>{float(row.get('control_severity_hsv_v', 0) or 0):.2f}</td>"
         "</tr>"
     )
-
 
 def _lane_row(row: dict) -> str:
     return (
@@ -128,10 +141,12 @@ def _lane_row(row: dict) -> str:
         f"<td>{float(row.get('fusarium_infection_area_percent', row.get('class0_area_percent', 0)) or 0):.2f}</td>"
         f"<td>{float(row.get('fusarium_infection_mean_maxrgb_intensity', row.get('class0_mean_maxrgb_intensity', 0)) or 0):.2f}</td>"
         f"<td>{float(row.get('fusarium_infection_mean_maxrgb_red', row.get('class0_mean_maxrgb_red', 0)) or 0):.2f}</td>"
+        f"<td>{float(row.get('fusarium_infection_mean_hsv_v', row.get('class0_mean_hsv_v', 0)) or 0):.2f}</td>"
         f"<td>{float(row.get('root_tissue_polygon_percent', row.get('class1_polygon_percent', 0)) or 0):.2f}</td>"
         f"<td>{float(row.get('root_tissue_area_percent', row.get('class1_area_percent', 0)) or 0):.2f}</td>"
         f"<td>{float(row.get('root_tissue_mean_maxrgb_intensity', row.get('class1_mean_maxrgb_intensity', 0)) or 0):.2f}</td>"
         f"<td>{float(row.get('root_tissue_mean_maxrgb_red', row.get('class1_mean_maxrgb_red', 0)) or 0):.2f}</td>"
+        f"<td>{float(row.get('root_tissue_mean_hsv_v', row.get('class1_mean_hsv_v', 0)) or 0):.2f}</td>"
         "</tr>"
     )
 
@@ -236,10 +251,12 @@ def _build_experiment_timepoint_report(experiment: str, timepoint: str, rows: Li
         bbox_rows_html = "".join(_bbox_row(r) for r in sorted(p.bbox_rows, key=lambda r: (int(r.get("lane_id", 0)), str(r.get("class_name", "")), int(r.get("bbox_index", 0)))))
         bbox_table = (
             "<table class='table'><thead><tr>"
-            "<th>BBox #</th><th>Class</th><th>Lane</th><th>Area px</th>"
-            "<th>px Fusarium infection</th><th>px Root tissue</th>"
-            "<th>Fusarium MaxRGB intensity</th><th>Fusarium MaxRGB red</th>"
-            "<th>Root MaxRGB intensity</th><th>Root MaxRGB red</th>"
+            "<th>BBox #</th><th>Class</th><th>Confidence</th>"
+            "<th>Width px</th><th>Height px</th><th>Lane</th><th>Mask area px</th>"
+            "<th>BBox overlap %</th><th>Mask overlap %</th><th>Overlaps with</th>"
+            "<th>BBox center x,y</th><th>Mask center x,y</th>"
+            "<th>Fusarium MaxRGB intensity</th><th>Fusarium MaxRGB red</th><th>Fusarium HSV-V</th>"
+            "<th>Root MaxRGB intensity</th><th>Root MaxRGB red</th><th>Root HSV-V</th>"
             f"</tr></thead><tbody>{bbox_rows_html}</tbody></table>"
         )
 
@@ -250,9 +267,9 @@ def _build_experiment_timepoint_report(experiment: str, timepoint: str, rows: Li
                 "<table class='table'><thead><tr>"
                 "<th>Lane</th><th>#Objects</th>"
                 "<th>Fusarium infection object %</th><th>Fusarium infection area %</th>"
-                "<th>Fusarium MaxRGB intensity</th><th>Fusarium MaxRGB red</th>"
+                "<th>Fusarium MaxRGB intensity</th><th>Fusarium MaxRGB red</th><th>Fusarium HSV-V</th>"
                 "<th>Root tissue object %</th><th>Root tissue area %</th>"
-                "<th>Root MaxRGB intensity</th><th>Root MaxRGB red</th>"
+                "<th>Root MaxRGB intensity</th><th>Root MaxRGB red</th><th>Root HSV-V</th>"
                 f"</tr></thead><tbody>{lane_rows_html}</tbody></table>"
             )
         else:
@@ -356,13 +373,13 @@ def _process_summary_csv(csv_path: Path, experiment: str, out_root: Path) -> Non
             row["plate_id"] = row.get("plate_id", "")
             row["image"] = row.get("image", "")
 
-            for key in ("bbox_index", "class_id", "pixels_class0", "pixels_class1", "pixels_fusarium_infection", "pixels_root_tissue", "lane_id", "polygon_area_px"):
+            for key in ("bbox_index", "class_id", "pixels_class0", "pixels_class1", "pixels_fusarium_infection", "pixels_root_tissue", "lane_id", "polygon_area_px", "bbox_width", "bbox_height", "polygon_x_min", "polygon_y_min", "polygon_x_max", "polygon_y_max", "overlap_area_px", "bbox_overlap_area_px", "mask_overlap_area_px"):
                 try:
                     row[key] = int(float(row.get(key, 0) or 0))
                 except (TypeError, ValueError):
                     row[key] = 0
 
-            for key in ("fusarium_severity_maxrgb_intensity", "fusarium_severity_maxrgb_red", "control_severity_maxrgb_intensity", "control_severity_maxrgb_red"):
+            for key in ("confidence", "polygon_centroid_x", "polygon_centroid_y", "overlap_percent", "bbox_overlap_percent", "mask_overlap_percent", "fusarium_severity_maxrgb_intensity", "fusarium_severity_maxrgb_red", "fusarium_severity_hsv_v", "control_severity_maxrgb_intensity", "control_severity_maxrgb_red", "control_severity_hsv_v"):
                 try:
                     row[key] = float(row.get(key, 0.0) or 0.0)
                 except (TypeError, ValueError):
