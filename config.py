@@ -8,19 +8,13 @@ from pathlib import Path
 # -------------------- user settings --------------------
 
 #MODEL_PATH = r"yolov8s-seg_img1024_ep150_AdamW_lr0.0005_best.pt"
-#MODEL_PATH = r"D:\stefanie\fus_root_high_02\yolov8s-seg_img1024_ep150_AdamW_lr0.0005\weights\best.pt"
-#MODEL_PATH = r"D:/stefanie/02_split_model/yolov8s-seg_img1024_ep150_AdamW_lr0.0005/weights/best.pt"
-MODEL_PATH = r"D:\stefanie\flou_rust01_yolo\yolov8n-seg_img1024_ep150_AdamW_lr0.001_wd0.0005-2\weights\best.pt"
+
 # Input root:
 #   ROOT_FOLDER / MB0001 / 10dai / 20250727_154933__F35-4 / ...preview.tif
-ROOT_FOLDER = r"\\psg-09\Mikroskop\Exchange\!to_analyze\macrobot\fusarium"
-#ROOT_FOLDER = r"\\hsm\AGR-BIM\macrobot\MB0560"
-#ROOT_FOLDER = r"D:\stefanie\screening"
+ROOT_FOLDER = r"\macrobot\fusarium"
 # Output root – same structure (experiment / timepoint / plate),
 # but filenames are clearly marked as predictions.
-#OUTPUT_ROOT = r"\\psg-09\Mikroskop\Images\FusVision\MB0361_yolov8s_test"
-#OUTPUT_ROOT = r"D:\stefanie\MB0560_002"
-OUTPUT_ROOT = r"D:\stefanie\screening\out"
+OUTPUT_ROOT = r"\screening\out"
 # Folder layout of ROOT_FOLDER.
 # False means: ROOT_FOLDER / timepoint / plate_id / image
 # True means:  ROOT_FOLDER / experiment / timepoint / plate_id / image
@@ -30,7 +24,7 @@ EXPERIMENT_NAME = Path(ROOT_FOLDER).name
 
 # ONLY process these (experiment, timepoint) combinations.
 # Example: ONLY_COMBINATIONS = [("MB0001", "10dai"), ("MB0002", "11dai")]
-ONLY_COMBINATIONS = [("MB0567", "4dai")]    # empty = process everything
+ONLY_COMBINATIONS = []    # empty = process everything
 
 # YOLO inference image size
 IMG_SIZE = 1024
