@@ -8,10 +8,10 @@ Edit the values here or override them from the command line in train_yolo.py.
 from pathlib import Path
 
 # Path to your YOLO segmentation data.yaml
-DATA_YAML = Path(r"D:\stefanie\03_bl\data.yaml")
+DATA_YAML = Path(r"D:\stefanie\fus_root_bl_yolo2506\data.yaml")
 
 # Folder where YOLO training runs will be stored
-TRAINING_OUTPUT_ROOT = Path(r"D:\stefanie\03_bl_out")
+TRAINING_OUTPUT_ROOT = Path(r"D:\stefanie\fus_root_bl_yolo2506_out")
 
 # Device:
 #   "auto" = cuda if available, otherwise cpu
