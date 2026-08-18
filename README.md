@@ -1,105 +1,65 @@
 # 🌾 BluVision Root — Fusarium Root Severity Pipeline
 
-![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
-![YOLOv8](https://img.shields.io/badge/YOLOv8-segmentation-brightgreen)
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![YOLO](https://img.shields.io/badge/YOLO-segmentation-brightgreen)
 ![OpenCV](https://img.shields.io/badge/OpenCV-image%20analysis-orange)
 ![Status](https://img.shields.io/badge/status-research%20tool-purple)
 
-BluVision Root is a Python pipeline for automated **Fusarium root infection analysis** from macrobot images. It preprocesses images, runs a YOLOv8 segmentation model, extracts object-level severity features, summarizes infection by four horizontal lanes, and creates convenient HTML reports for visual inspection.
+BluVision Root is a Python pipeline for automated **Fusarium root infection analysis** from macrobot images. It preprocesses images, runs YOLO segmentation, calculates object- and lane-level severity metrics, and generates CSV and HTML reports.
 
 <img src="BluVisionRoot.png" width="1000">
 
+## ✨ Features
 
-## ✨ What this tool does
-
-- 🖼️ Loads images from experiment folders
-- ⚖️ Converts images to 8-bit and applies percentile white balance
-- ✂️ Crops fixed image borders before prediction
-- 🤖 Runs YOLOv8 segmentation on the preprocessed image
-- 🔴 Calculates **MaxRGB dominant-channel intensity** inside each segmentation mask
-- 🧫 Separates object metrics for class 0 and class 1
-- 📊 Assigns each object to one of **4 lanes** based on horizontal position
-- 📈 Calculates infection percentages per class and lane
-- 🧾 Writes object-level and lane-level CSV summaries
-- 🌐 Builds one combined HTML report per DAI/timepoint with all plates inside
-
----
-
-## 📁 Expected input structure
-
-The current default setup is for a root folder that already points to one experiment, for example `MB0504`:
-
-```text
-ROOT_FOLDER/
-├── 1dai/
-│   ├── 20260224_111232__T02/
-│   │   └── 20260224_111232__T02_preview.tif
-│   └── another_plate/
-│       └── another_plate_preview.tif
-├── 2dai/
-│   └── plate_folder/
-│       └── plate_preview.tif
-```
-
-For this layout, keep this in `config.py`:
-
-```python
-INPUT_HAS_EXPERIMENT_LEVEL = False
-EXPERIMENT_NAME = "MB0361"
-```
-
-If your input root contains several experiments:
-
-```text
-ROOT_FOLDER/
-├── MB0504/
-│   ├── 1dai/
-│   │   └── plate_folder/
-│   │       └── image_preview.tif
-├── MB0505/
-│   └── 1dai/
-│       └── plate_folder/
-│           └── image_preview.tif
-```
-
-then set:
-
-```python
-INPUT_HAS_EXPERIMENT_LEVEL = True
-```
-
----
+- Image preprocessing and percentile white balance
+- YOLO segmentation
+- MaxRGB-based severity measurements
+- Object-level metrics for Fusarium infection and root tissue
+- Automatic assignment to 4 horizontal lanes
+- CSV summaries and visual HTML reports
+- Batch processing of complete experiments
 
 ## 📦 Installation
-### 1. Clone BluVisionRoot
 
 ```bash
 git clone https://github.com/snowformatics/BluVisionRoot.git
 cd BluVisionRoot
-```
 
-### 2. Create a new environment
-
-```bash
 conda create -n fusvision python=3.10 -y
 conda activate fusvision
-```
 
-### 3. Install dependencies
-
-```bash
 pip install ultralytics opencv-python numpy torch torchvision
 ```
 
-For GPU support, install the PyTorch build matching your CUDA version from the official PyTorch instructions.
+### Optional GPU support
 
+For NVIDIA GPUs, install the PyTorch build matching your CUDA setup from the official PyTorch installation guide:
 
+https://pytorch.org/get-started/locally/
 
----
+Check GPU availability:
+
+```bash
+python -c "import torch; print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
+```
+
+## 🧪 Test the pipeline
+
+A ready-to-use test dataset is included in:
+
+```text
+test_images/
+```
+
+`config.py` is already configured for this test. After installation, simply run:
+
+```bash
+python main.py
+```
 
 ## ⚙️ Configuration
 
-Edit `config.py` before running:
+Edit `config.py` for your own dataset:
 
 ```python
 MODEL_PATH = r"yolov8s-seg_img1024_ep150_AdamW_lr0.0005_best.pt"
@@ -110,140 +70,79 @@ EXPERIMENT_NAME = "MB0504"
 INPUT_HAS_EXPERIMENT_LEVEL = False
 
 IMG_SIZE = 1024
-DEVICE = "cpu"   # or "0" for GPU
+DEVICE = "cpu"          # "0" for GPU
 FILE_SUFFIX = "preview.tif"
 N_LANES = 4
 ```
 
-Optional filtering:
+For a root folder containing multiple experiments:
 
 ```python
-ONLY_COMBINATIONS = [("MB0504", "1dai")]
+INPUT_HAS_EXPERIMENT_LEVEL = True
 ```
 
-Leave it empty to process all DAI/timepoint folders.
+## 📁 Input structure
 
----
+Single experiment:
 
-## ▶️ Usage
+```text
+ROOT_FOLDER/
+├── 1dai/
+│   └── plate_folder/
+│       └── image_preview.tif
+└── 2dai/
+    └── plate_folder/
+        └── image_preview.tif
+```
 
-Run the pipeline from the folder containing `main.py`:
+Multiple experiments:
+
+```text
+ROOT_FOLDER/
+├── MB0504/
+│   └── 1dai/
+│       └── plate_folder/
+│           └── image_preview.tif
+└── MB0505/
+    └── 1dai/
+        └── plate_folder/
+            └── image_preview.tif
+```
+
+## ▶️ Run
 
 ```bash
 python main.py
 ```
 
-The pipeline will:
+The pipeline performs preprocessing, segmentation, MaxRGB analysis, lane assignment, CSV export, and HTML report generation.
 
-1. find all preview images,
-2. preprocess each image,
-3. save the white-balanced image,
-4. save MaxRGB, bounding-box, and polygon images,
-5. calculate object metrics,
-6. calculate lane summaries,
-7. create HTML reports.
+## 📤 Outputs
 
----
-
-## 📤 Output structure
-
-For the `MB0504 / 1dai / plate / image` layout, outputs are written like this:
+Typical output:
 
 ```text
 OUTPUT_ROOT/
 ├── MB0504_summary.csv
 ├── MB0504_lane_summary.csv
 ├── MB0504_report_index.html
-├── 1dai/
-│   ├── MB0504_1dai_all_plates_report.html
-│   ├── plate_folder/
-│   │   ├── image_preview_wb.png
-│   │   ├── image_preview_boxes.png
-│   │   ├── image_preview_poly.png
-│   │   └── image_preview_maxrgb.png
+└── 1dai/
+    ├── MB0504_1dai_all_plates_report.html
+    └── plate_folder/
+        ├── image_preview_wb.png
+        ├── image_preview_boxes.png
+        ├── image_preview_poly.png
+        └── image_preview_maxrgb.png
 ```
 
-### 🌐 HTML reports
+The reports use:
 
-Each DAI/timepoint has **one combined report page** containing all plates for that DAI. For every plate you see:
-
-- white-balanced image
-- bounding-box image
-- polygon image
-- lane infection summary
-- per-object measurements
-
-An additional `MB0504_report_index.html` links to all DAI reports.
-
----
-
-## 📊 Important CSV columns
-
-### Object-level CSV
-
-| Column | Meaning |
+| Class | Label |
 |---|---|
-| `class_id` | YOLO class ID |
-| `class_name` | YOLO class label |
-| `lane_id` | Assigned lane from 1 to 4 |
-| `polygon_area_px` | Number of pixels in the object mask |
-| `fusarium_severity_maxrgb_intensity` | Mean MaxRGB dominant-channel intensity for Fusarium class |
-| `control_severity_maxrgb_intensity` | Mean MaxRGB dominant-channel intensity for non-Fusarium class |
+| `0` | Fusarium infection |
+| `1` | Root tissue |
 
-### Lane-summary CSV
-
-| Column | Meaning |
-|---|---|
-| `lane_polygon_count_total` | Number of objects in the lane |
-| `class0_polygon_percent` | Percent of objects belonging to class 0 |
-| `class0_area_percent` | Percent of segmented area belonging to class 0 |
-| `class1_polygon_percent` | Percent of objects belonging to class 1 |
-| `class1_area_percent` | Percent of segmented area belonging to class 1 |
-
----
-
-## 🔬 MaxRGB severity calculation
-
-The pipeline now follows the comparison script logic:
-
-```python
-maximumRGB_intensity = maximum_R + maximum_G + maximum_B
-mean_intensity = np.mean(maximumRGB_intensity[mask])
-```
-
-Because the MaxRGB image keeps only the dominant channel per pixel, this measures the dominant-channel intensity inside the segmentation mask, independent of whether the dominant channel is red, green, or blue.
-
----
-
-## 🧪 Notes
-
-- The current pipeline assumes two classes: class 0 and class 1.
-- `FUSARIUM_CLASS_ID = 0` controls which class is written to the Fusarium severity column.
-- Lane assignment is based on the horizontal center of each bounding box.
-- The HTML report uses relative paths, so the output folder can be copied as a self-contained report directory.
-
----
-
-## 📜 License
-
-GNU GENERAL PUBLIC LICENSE Version 3
-
-
-## 🆕 Latest metric update
-
-The report now uses readable biological class names instead of raw `class0` / `class1` labels:
-
-| Model class | Report label | Meaning |
-|---|---|---|
-| `0` | **Fusarium infection** | infected / diseased segmentation class |
-| `1` | **Root tissue** | root / non-infection segmentation class |
-
-Two MaxRGB severity values are written for each object and lane summary:
-
-- **MaxRGB intensity**: `maximum_B + maximum_G + maximum_R`, matching the comparison script.
-- **MaxRGB red**: red channel only after MaxRGB filtering, useful when you want the stricter red-dominant signal.
-
-You can rename the classes in `config.py` by editing:
+Class names can be changed in `config.py`:
 
 ```python
 CLASS_DISPLAY_NAMES = {
@@ -252,11 +151,38 @@ CLASS_DISPLAY_NAMES = {
 }
 ```
 
----
+## 🔬 Severity metric
 
-## 🏋️ Standalone YOLO training module
+MaxRGB keeps the dominant RGB channel at each pixel and calculates the mean intensity inside each segmentation mask:
 
-The package now also contains a **separate training-only module** in:
+```python
+maximumRGB_intensity = maximum_R + maximum_G + maximum_B
+mean_intensity = np.mean(maximumRGB_intensity[mask])
+```
+
+The pipeline also reports the red channel after MaxRGB filtering for a stricter red-dominant signal.
+
+## ⚡ Benchmark
+
+The full end-to-end pipeline was benchmarked on **2,268 images** using the CPU.
+
+| Metric             | Result |
+|--------------------|---|
+| CPU                | 2 × Intel Xeon E5-2643 v3 |
+| CPU resources      | 8 cores / 16 logical processors |
+| RAM                | 128 GB |
+| GPU (off)          | NVIDIA GeForce RTX 3090 |
+| Dataset            | 2,268 images |
+| Total CPU runtime  | 10,167.98 s (2 h 49 min 28 s) |
+| Average runtime    | 4.48 s/image |
+| Throughput         | ~0.223 images/s (~13.38 images/min) |
+| Observed RAM usage | ~11 GB |
+
+Runtime includes **image loading, preprocessing, inference, post-processing, and output generation**, not inference alone. RAM usage is an indicative Task Manager observation rather than a run-wide average.
+
+## 🏋️ YOLO training
+
+Standalone training utilities are available in:
 
 ```text
 training/
@@ -265,67 +191,32 @@ training/
 └── train_yolo.py
 ```
 
-This module is intentionally independent from the prediction/reporting pipeline.
-It only trains YOLO segmentation models and creates a compact CSV overview of the best runs.
-It does **not** preprocess real experiment images and it does **not** run prediction.
-
-### ⚙️ Training configuration
-
-Edit `training/training_config.py`:
-
-```python
-DATA_YAML = Path(r"data.yaml")
-TRAINING_OUTPUT_ROOT = Path(r"fus_root_training")
-DEVICE = "auto"
-
-MODELS = [
-    "yolo11m-seg.pt",
-    "yolo11s-seg.pt",
-    "yolo26m-seg.pt",
-    "yolo26s-seg.pt",
-]
-
-IMG_SIZES = [1024, 1280]
-EPOCHS_LIST = [150, 300]
-OPTIMIZERS = ["AdamW"]
-LR0_VALUES = [0.001]
-WEIGHT_DECAY_VALUES = [0.0005]
-```
-
-### ▶️ Start training
-
-From the project folder:
-
-```bash
-cd training
-python train_yolo.py \
-  --source_path data.yaml \
-  --destination_path fus_root_training \
-  --device auto
-```
-
-Or use only the paths from `training_config.py`:
+Run training:
 
 ```bash
 cd training
 python train_yolo.py
 ```
 
-### 📊 Create only the training overview
-
-If training runs already exist and you only want to summarize them:
+Create only the training overview:
 
 ```bash
-cd training
-python train_yolo.py \
-  --destination_path D:/stefanie/fus_root_high \
-  --overview_only
+python train_yolo.py --destination_path PATH_TO_RUNS --overview_only
 ```
 
-This writes:
+This generates:
 
 ```text
 model_training_overview.csv
 ```
 
-The overview includes best mask mAP, mAP50, precision, recall, box metrics, and segmentation losses for every training run.
+## 🧹 Remove environment
+
+```bash
+conda deactivate
+conda env remove -n fusvision
+```
+
+## 📜 License
+
+GNU General Public License v3.0
