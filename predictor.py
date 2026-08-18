@@ -57,6 +57,7 @@ class MacrobotPredictor:
         save images, and create per-experiment CSV files.
         """
         all_images = list(iter_preview_images(root_folder, file_suffix))
+
         if not all_images:
             print(f"No '*{file_suffix}' images found under: {root_folder}")
             return

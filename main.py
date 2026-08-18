@@ -6,7 +6,7 @@ Usage (from this folder):
     python main.py
 """
 
-from config import (
+from config1 import (
     CLASS_COLORS,
     CLIP_PERCENT,
     CONF_THRESHOLD,
@@ -46,3 +46,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

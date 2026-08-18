@@ -7,14 +7,14 @@ from pathlib import Path
 
 # -------------------- user settings --------------------
 
-#MODEL_PATH = r"yolov8s-seg_img1024_ep150_AdamW_lr0.0005_best.pt"
+MODEL_PATH = r"yolov8s-seg_img1024_ep150_AdamW_lr0.0005_best.pt"
 
 # Input root:
 #   ROOT_FOLDER / MB0001 / 10dai / 20250727_154933__F35-4 / ...preview.tif
-ROOT_FOLDER = r"\macrobot\fusarium"
+ROOT_FOLDER = r"test_images"
 # Output root – same structure (experiment / timepoint / plate),
 # but filenames are clearly marked as predictions.
-OUTPUT_ROOT = r"\screening\out"
+OUTPUT_ROOT = r""
 # Folder layout of ROOT_FOLDER.
 # False means: ROOT_FOLDER / timepoint / plate_id / image
 # True means:  ROOT_FOLDER / experiment / timepoint / plate_id / image
@@ -56,7 +56,7 @@ N_LANES = 4
 # Here: class 0 = Fusarium/red overlay, class 1 = control/green overlay.
 CLASS_COLORS = {
     1: (0, 255, 0),   # green for class 1
-    0: (0, 0, 255),   # red for class 0 (fusarium)
+    0: (0, 0, 255),   # red for class 0 (test_images)
 }
 
 # Which class is Fusarium for severity calculation?

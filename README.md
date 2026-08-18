@@ -23,7 +23,6 @@ BluVision Root is a Python pipeline for automated **Fusarium root infection anal
 - 🧾 Writes object-level and lane-level CSV summaries
 - 🌐 Builds one combined HTML report per DAI/timepoint with all plates inside
 
-
 ---
 
 ## 📁 Expected input structure
@@ -46,7 +45,7 @@ For this layout, keep this in `config.py`:
 
 ```python
 INPUT_HAS_EXPERIMENT_LEVEL = False
-EXPERIMENT_NAME = "MB0504"
+EXPERIMENT_NAME = "MB0361"
 ```
 
 If your input root contains several experiments:
@@ -72,15 +71,21 @@ INPUT_HAS_EXPERIMENT_LEVEL = True
 ---
 
 ## 📦 Installation
+### 1. Clone BluVisionRoot
 
-### 1. Create a new environment
+```bash
+git clone https://github.com/snowformatics/BluVisionRoot.git
+cd BluVisionRoot
+```
+
+### 2. Create a new environment
 
 ```bash
 conda create -n fusvision python=3.10 -y
 conda activate fusvision
 ```
 
-### 2. Install dependencies
+### 3. Install dependencies
 
 ```bash
 pip install ultralytics opencv-python numpy torch torchvision
