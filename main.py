@@ -6,7 +6,7 @@ Usage (from this folder):
     python main.py
 """
 
-from config1 import (
+from config import (
     CLASS_COLORS,
     CLIP_PERCENT,
     CONF_THRESHOLD,
